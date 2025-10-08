@@ -57,14 +57,14 @@ import { ExcelTableProps, CellSelection, DragSelection, ClipboardData } from './
  */
 
 // Combobox Editor Component (extracted to avoid hooks rule violation)
-function ComboboxEditor({ 
-    cellValue, 
-    editOptions, 
-    handleChange, 
-    handleBlur 
-}: { 
+function ComboboxEditor({
+    cellValue,
+    editOptions,
+    handleChange,
+    handleBlur
+}: {
     cellValue: unknown
-    editOptions: { 
+    editOptions: {
         options?: Array<{ label: string; value: string | number }>
         placeholder?: string
     }
