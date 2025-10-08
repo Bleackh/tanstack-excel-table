@@ -6,6 +6,11 @@ First off, thank you for considering contributing to TanStack Excel Table! 🎉
 
 ### Reporting Bugs
 
+You can report bugs in two ways:
+
+1. **Using the in-app feature**: Click the "Report Issue" button in the application to open a pre-filled GitHub issue form
+2. **Directly on GitHub**: Create a new issue on the [GitHub repository](https://github.com/Bleackh/tanstack-excel-table/issues)
+
 Before creating bug reports, please check existing issues to avoid duplicates. When you create a bug report, include as many details as possible:
 
 - **Use a clear and descriptive title**
@@ -15,6 +20,11 @@ Before creating bug reports, please check existing issues to avoid duplicates. W
 - **Include your environment details** (OS, Node version, browser)
 
 ### Suggesting Enhancements
+
+You can suggest enhancements in two ways:
+
+1. **Using the in-app feature**: Click the "Report Issue" button and select "Enhancement" to open a pre-filled GitHub issue form
+2. **Directly on GitHub**: Create a new issue on the [GitHub repository](https://github.com/Bleackh/tanstack-excel-table/issues)
 
 Enhancement suggestions are tracked as GitHub issues. When creating an enhancement suggestion:
 

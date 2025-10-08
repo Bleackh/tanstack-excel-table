@@ -13,6 +13,7 @@ A powerful, Excel-like table component built with [TanStack Table](https://tanst
 - ✅ **Row Selection** - Checkbox selection for multiple rows
 - ✅ **Pattern Detection** - Smart auto-increment for numeric sequences
 - ✅ **Modern UI** - Beautiful components powered by Shadcn UI
+- ✅ **Issue Submission** - Report bugs or request features directly from the app
 
 ## 🚀 Getting Started
 
