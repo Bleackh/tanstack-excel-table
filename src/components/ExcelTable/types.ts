@@ -22,6 +22,12 @@ declare module '@tanstack/react-table' {
                 onKeyDown: (e: React.KeyboardEvent) => void
             }) => React.ReactNode // Custom editor renderer
         }
+        filterComponent?: 'input' | 'select' // Type of filter component (default: input)
+        filterOptions?: {
+            options?: Array<{ label: string; value: string | number }> // Options for select filter
+            placeholder?: string // Placeholder text
+            getUniqueValues?: boolean // Auto-generate options from column data
+        }
     }
 }
 

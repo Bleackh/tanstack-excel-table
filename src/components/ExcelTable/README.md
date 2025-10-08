@@ -225,6 +225,58 @@ const columns: ColumnDef<MyData>[] = [
 - Set `meta.editable: false` to make a column **read-only**
 - Read-only columns cannot be edited via double-click, Enter key, or direct typing
 
+### Column Filtering with Select Dropdown
+
+Anda dapat menggunakan **select dropdown** untuk filter kolom, dengan opsi untuk auto-generate unique values dari data:
+
+#### Auto-Generate dari Data (Recommended)
+
+```tsx
+{
+    accessorKey: 'status',
+    header: 'Status',
+    meta: {
+        filterComponent: 'select',
+        filterOptions: {
+            getUniqueValues: true,  // ✅ Auto-generate dari data
+            placeholder: 'All Status',
+        },
+    },
+    enableColumnFilter: true,
+}
+```
+
+**Features:**
+- ✅ **Auto-extract** unique values dari kolom data
+- ✅ **Auto-sort** values alphabetically
+- ✅ Filter empty/null values
+- ✅ Select dropdown untuk UX yang lebih baik
+
+#### Manual Options
+
+```tsx
+{
+    accessorKey: 'category',
+    header: 'Category',
+    meta: {
+        filterComponent: 'select',
+        filterOptions: {
+            options: [
+                { label: 'Active', value: 'active' },
+                { label: 'Inactive', value: 'inactive' },
+                { label: 'Pending', value: 'pending' },
+            ],
+            placeholder: 'Filter by category...',
+        },
+    },
+    enableColumnFilter: true,
+}
+```
+
+**When to Use:**
+- **Auto-generate** (`getUniqueValues: true`): Best untuk data dinamis yang berubah-ubah
+- **Manual options**: Best untuk fixed categories atau custom labels
+
 ### Custom Editor Components
 
 ExcelTable menggunakan **Shadcn UI components** untuk editor yang cantik dan konsisten. Setiap kolom dapat memiliki tipe editor berbeda:

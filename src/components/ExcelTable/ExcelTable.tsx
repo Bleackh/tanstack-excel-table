@@ -15,6 +15,13 @@ import { MoveUp, MoveDown, MoveVertical, CalendarIcon, Check, ChevronsUpDown } f
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select'
+import {
     Popover,
     PopoverContent,
     PopoverTrigger,
@@ -131,6 +138,35 @@ function ComboboxEditor({
                 </PopoverContent>
             </Popover>
         </div>
+    )
+}
+
+// Filter Select Component for column filtering
+function FilterSelect({
+    value,
+    onChange,
+    options,
+    placeholder
+}: {
+    value: string
+    onChange: (value: string) => void
+    options: Array<{ label: string; value: string | number }>
+    placeholder?: string
+}) {
+    return (
+        <Select value={value} onValueChange={onChange}>
+            <SelectTrigger className="h-8 w-full" onClick={(e) => e.stopPropagation()}>
+                <SelectValue placeholder={placeholder || 'All'} />
+            </SelectTrigger>
+            <SelectContent>
+                <SelectItem value=" ">All</SelectItem>
+                {options.map((opt) => (
+                    <SelectItem key={opt.value} value={String(opt.value)}>
+                        {opt.label}
+                    </SelectItem>
+                ))}
+            </SelectContent>
+        </Select>
     )
 }
 
@@ -714,27 +750,60 @@ export default function ExcelTable<TData extends Record<string, unknown>>({
                             </tr>
                             {filtering && (
                                 <tr className="bg-white sticky  z-10">
-                                    {headerGroup.headers.map(header => (
-                                        <th
-                                            key={header.id}
-                                            className="px-6 py-2 border-r border-gray-200 last:border-r-0 bg-white"
-                                        >
-                                            {header.column.getCanFilter() ? (
-                                                <Input
-                                                    type="text"
-                                                    value={(header.column.getFilterValue() ?? '') as string}
-                                                    onChange={(e) => header.column.setFilterValue(e.target.value)}
-                                                    placeholder={`Filter ${header.column.columnDef.meta?.headerLabel ||
-                                                        (typeof header.column.columnDef.header === 'string'
-                                                            ? header.column.columnDef.header
-                                                            : header.id)
-                                                        }...`}
-                                                    className="h-8"
-                                                    onClick={(e) => e.stopPropagation()}
-                                                />
-                                            ) : null}
-                                        </th>
-                                    ))}
+                                    {headerGroup.headers.map(header => {
+                                        const filterComponent = header.column.columnDef.meta?.filterComponent
+                                        const filterOptions = header.column.columnDef.meta?.filterOptions
+
+                                        // Generate unique values from data if getUniqueValues is true
+                                        let options = filterOptions?.options || []
+                                        if (filterOptions?.getUniqueValues && header.column.id) {
+                                            const uniqueValues = Array.from(
+                                                new Set(
+                                                    data.map(row => (row as Record<string, unknown>)[header.column.id])
+                                                        .filter(val => val !== null && val !== undefined && val !== '')
+                                                )
+                                            ).sort()
+
+                                            options = uniqueValues.map(val => ({
+                                                label: String(val),
+                                                value: val as string | number
+                                            }))
+                                        }
+
+                                        return (
+                                            <th
+                                                key={header.id}
+                                                className="px-6 py-2 border-r border-gray-200 last:border-r-0 bg-white"
+                                            >
+                                                {header.column.getCanFilter() ? (
+                                                    filterComponent === 'select' ? (
+                                                        <FilterSelect
+                                                            value={(header.column.getFilterValue() ?? '') as string}
+                                                            onChange={(value) => {
+                                                                // Clear filter if "All" is selected (value with space)
+                                                                header.column.setFilterValue(value.trim() === '' ? undefined : value)
+                                                            }}
+                                                            options={options}
+                                                            placeholder={filterOptions?.placeholder || `Filter ${header.column.columnDef.meta?.headerLabel || header.id}...`}
+                                                        />
+                                                    ) : (
+                                                        <Input
+                                                            type="text"
+                                                            value={(header.column.getFilterValue() ?? '') as string}
+                                                            onChange={(e) => header.column.setFilterValue(e.target.value)}
+                                                            placeholder={`Filter ${header.column.columnDef.meta?.headerLabel ||
+                                                                (typeof header.column.columnDef.header === 'string'
+                                                                    ? header.column.columnDef.header
+                                                                    : header.id)
+                                                                }...`}
+                                                            className="h-8"
+                                                            onClick={(e) => e.stopPropagation()}
+                                                        />
+                                                    )
+                                                ) : null}
+                                            </th>
+                                        )
+                                    })}
                                 </tr>
                             )}
                         </React.Fragment>

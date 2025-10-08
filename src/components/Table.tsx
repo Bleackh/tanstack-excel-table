@@ -240,9 +240,15 @@ export const columns: ColumnDef<Person, any>[] = [
                 ],
                 placeholder: 'Pilih Status',
             },
+            // 🔍 Filter dengan select dropdown
+            filterComponent: 'select',
+            filterOptions: {
+                getUniqueValues: true, // Auto-generate options dari data
+                placeholder: 'All Status',
+            },
         },
         filterFn: 'equalsString',
-        enableColumnFilter: true, // ✅ Filter aktif
+        enableColumnFilter: true, // ✅ Filter aktif dengan select
     },
 ]
 
