@@ -32,6 +32,8 @@ Enhancement suggestions are tracked as GitHub issues. When creating an enhanceme
 5. **Commit your changes** with clear commit messages
 6. **Push to your fork** and submit a pull request
 
+**Important**: All pull requests must be reviewed and approved by the repository maintainer (@Bleackh) before merging. This ensures code quality and consistency across the project. Your contributions are valuable, and we appreciate your patience during the review process! 🙏
+
 ## 📝 Development Setup
 
 ### Prerequisites
@@ -144,6 +146,18 @@ Feel free to open an issue for:
 ## 🙏 Thank You!
 
 Your contributions make this project better for everyone. We appreciate your time and effort! ⭐
+
+---
+
+## 🔐 Merge Permissions
+
+This repository uses branch protection rules to maintain code quality:
+
+- **Anyone can submit pull requests** - We welcome contributions from everyone!
+- **Only the repository maintainer can merge** - All PRs require approval from @Bleackh before merging
+- **Code review is required** - Every PR must be reviewed to ensure quality and consistency
+
+For more details on how this is configured, see [Branch Protection Guide](./.github/BRANCH_PROTECTION_GUIDE.md).
 
 ---
 

@@ -134,7 +134,11 @@ pnpm lint         # Run ESLint
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please feel free to submit a Pull Request. 
+
+**Note**: All pull requests must be reviewed and approved by the repository maintainer before merging to ensure code quality and consistency.
+
+For detailed contribution guidelines, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## 📄 License
 
