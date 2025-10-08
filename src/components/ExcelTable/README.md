@@ -225,6 +225,210 @@ const columns: ColumnDef<MyData>[] = [
 - Set `meta.editable: false` to make a column **read-only**
 - Read-only columns cannot be edited via double-click, Enter key, or direct typing
 
+### Custom Editor Components
+
+ExcelTable menggunakan **Shadcn UI components** untuk editor yang cantik dan konsisten. Setiap kolom dapat memiliki tipe editor berbeda:
+
+**Available Editor Types:**
+- `input` - Text input (default)
+- `select` - Dropdown select (invisible mode, terlihat seperti input)
+- `date` - Date picker dengan calendar
+- `textarea` - Multi-line text
+- `custom` - Custom render function
+
+**Required Shadcn UI Components:**
+```bash
+npx shadcn@latest add input
+npx shadcn@latest add select
+npx shadcn@latest add textarea
+npx shadcn@latest add calendar
+npx shadcn@latest add popover
+npx shadcn@latest add button
+```
+
+**Required Dependencies:**
+```bash
+pnpm add date-fns  # untuk date formatting
+```
+
+#### Examples:
+
+**1. SELECT DROPDOWN (Invisible Mode)**
+```tsx
+{
+    accessorKey: 'status',
+    header: 'Status',
+    meta: {
+        editComponent: 'select',
+        editOptions: {
+            options: [
+                { label: 'Aktif', value: 'active' },
+                { label: 'Cuti', value: 'leave' },
+                { label: 'Resign', value: 'resign' },
+            ],
+            placeholder: 'Pilih status...'
+        },
+    },
+}
+```
+**Catatan:** Select akan terlihat seperti input biasa saat tidak di-edit, dan saat di-edit akan muncul dropdown untuk memilih value. Ini membuat tampilan lebih clean dan consistent dengan cell lain.
+
+**2. DATE PICKER with Calendar**
+```tsx
+{
+    accessorKey: 'joinDate',
+    header: 'Join Date',
+    meta: {
+        editComponent: 'date',
+    },
+}
+```
+**Catatan:** Menggunakan Shadcn Calendar component dengan Popover, format tanggal menggunakan `date-fns`.
+
+**3. TEXTAREA**
+```tsx
+{
+    accessorKey: 'notes',
+    header: 'Notes',
+    meta: {
+        editComponent: 'textarea',
+        editOptions: {
+            rows: 3,
+            placeholder: 'Enter notes...'
+        },
+    },
+}
+```
+
+**4. INPUT (Default)**
+```tsx
+{
+    accessorKey: 'name',
+    header: 'Name',
+    meta: {
+        editComponent: 'input',  // Optional, default jika tidak ditentukan
+        editOptions: {
+            placeholder: 'Enter name...'
+        },
+    },
+}
+```
+
+**5. CUSTOM EDITOR**
+```tsx
+{
+    accessorKey: 'price',
+    header: 'Price',
+    meta: {
+        editComponent: 'custom',
+        editOptions: {
+            customRender: ({ value, onChange, onBlur, onKeyDown }) => (
+                <div className="flex items-center">
+                    <span className="mr-1">Rp</span>
+                    <input
+                        type="number"
+                        autoFocus
+                        className="w-full outline-none"
+                        defaultValue={value as number}
+                        onBlur={(e) => {
+                            onChange(Number(e.target.value))
+                            onBlur()
+                        }}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                                onChange(Number((e.target as HTMLInputElement).value))
+                                onBlur()
+                            }
+                            onKeyDown?.(e)
+                        }}
+                    />
+                </div>
+            ),
+        },
+    },
+}
+```
+
+**Full Example:**
+```tsx
+import { ColumnDef } from '@tanstack/react-table'
+
+interface Employee {
+    id: number
+    name: string
+    status: 'active' | 'leave' | 'resign'
+    joinDate: string
+    notes: string
+    salary: number
+}
+
+const columns: ColumnDef<Employee>[] = [
+    {
+        accessorKey: 'id',
+        header: 'ID',
+        meta: { editable: false },  // Read-only
+    },
+    {
+        accessorKey: 'name',
+        header: 'Name',
+        // Default input editor
+    },
+    {
+        accessorKey: 'status',
+        header: 'Status',
+        meta: {
+            editComponent: 'select',
+            editOptions: {
+                options: [
+                    { label: 'Aktif', value: 'active' },
+                    { label: 'Cuti', value: 'leave' },
+                    { label: 'Resign', value: 'resign' },
+                ],
+            },
+        },
+    },
+    {
+        accessorKey: 'joinDate',
+        header: 'Join Date',
+        meta: {
+            editComponent: 'date',
+        },
+    },
+    {
+        accessorKey: 'notes',
+        header: 'Notes',
+        meta: {
+            editComponent: 'textarea',
+            editOptions: { rows: 3 },
+        },
+    },
+    {
+        accessorKey: 'salary',
+        header: 'Salary',
+        meta: {
+            editComponent: 'custom',
+            editOptions: {
+                customRender: ({ value, onChange, onBlur }) => (
+                    <input
+                        type="number"
+                        autoFocus
+                        defaultValue={value as number}
+                        onBlur={(e) => {
+                            onChange(Number(e.target.value))
+                            onBlur()
+                        }}
+                    />
+                ),
+            },
+        },
+    },
+]
+```
+]
+\`\`\`
+
+**Available Types:** `input` (default), `select`, `date`, `textarea`, `custom`
+
 ### Disable Specific Features
 
 \`\`\`tsx
@@ -284,19 +488,84 @@ Each column can have additional metadata to control behavior:
 
 \`\`\`ts
 interface ColumnMeta {
-    headerLabel?: string  // Label for filter placeholder (default: column id)
-    editable?: boolean    // Allow column to be edited (default: true)
+    // Filter placeholder label
+    headerLabel?: string
+    
+    // Allow column to be edited (default: true)
+    editable?: boolean
+    
+    // Type of editor component
+    editComponent?: 'input' | 'select' | 'date' | 'textarea' | 'custom'
+    
+    // Options for editor component
+    editOptions?: {
+        // Options for select dropdown
+        options?: Array<{ label: string; value: string | number }>
+        
+        // Placeholder text
+        placeholder?: string
+        
+        // Rows for textarea
+        rows?: number
+        
+        // Custom editor renderer
+        customRender?: (params: {
+            value: unknown
+            onChange: (value: unknown) => void
+            onBlur: () => void
+            onKeyDown: (e: React.KeyboardEvent) => void
+        }) => React.ReactNode
+    }
 }
 \`\`\`
 
-**Example:**
+**Examples:**
+
 \`\`\`tsx
+// Read-only column
 {
     accessorKey: 'id',
-    header: () => <div>ID</div>,
     meta: {
-        headerLabel: 'ID',
-        editable: false,    // Make this column read-only
+        editable: false,
+    },
+}
+
+// Select dropdown
+{
+    accessorKey: 'status',
+    meta: {
+        editComponent: 'select',
+        editOptions: {
+            options: [
+                { label: 'Active', value: 'active' },
+                { label: 'Inactive', value: 'inactive' },
+            ],
+        },
+    },
+}
+
+// Date picker
+{
+    accessorKey: 'date',
+    meta: {
+        editComponent: 'date',
+    },
+}
+
+// Custom component
+{
+    accessorKey: 'price',
+    meta: {
+        editComponent: 'custom',
+        editOptions: {
+            customRender: ({ value, onChange, onBlur }) => (
+                <YourCustomComponent
+                    value={value}
+                    onChange={onChange}
+                    onBlur={onBlur}
+                />
+            ),
+        },
     },
 }
 \`\`\`

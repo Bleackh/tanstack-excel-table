@@ -10,6 +10,18 @@ declare module '@tanstack/react-table' {
     interface ColumnMeta<TData, TValue> {
         headerLabel?: string // String label untuk filter placeholder
         editable?: boolean   // Allow column to be edited (default: true)
+        editComponent?: 'input' | 'select' | 'date' | 'textarea' | 'custom' // Type of editor component
+        editOptions?: {
+            options?: Array<{ label: string; value: string | number }> // Options for select
+            placeholder?: string // Placeholder text
+            rows?: number // Rows for textarea
+            customRender?: (params: {
+                value: unknown
+                onChange: (value: unknown) => void
+                onBlur: () => void
+                onKeyDown: (e: React.KeyboardEvent) => void
+            }) => React.ReactNode // Custom editor renderer
+        }
     }
 }
 

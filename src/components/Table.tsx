@@ -199,6 +199,20 @@ export const columns: ColumnDef<Person, any>[] = [
         enableColumnFilter: false, // ❌ Nonaktifkan filter untuk sensitive data
     },
     {
+        accessorKey: 'joinDate',
+        header: () => <div className="text-sm font-semibold">Join Date</div>,
+        cell: ({ row }) => (
+            <div className="text-sm text-gray-600">{row.getValue('joinDate')}</div>
+        ),
+        meta: {
+            headerLabel: 'Join Date',
+            editable: true,        // ✅ Join Date bisa di-edit
+            editComponent: 'date', // 📅 Gunakan date picker
+        },
+        filterFn: 'includesString',
+        enableColumnFilter: false, // ❌ Nonaktifkan filter untuk contoh
+    },
+    {
         accessorKey: 'status',
         header: () => <div className="text-sm font-semibold">Status</div>,
         cell: ({ row }) => {
@@ -216,23 +230,19 @@ export const columns: ColumnDef<Person, any>[] = [
         },
         meta: {
             headerLabel: 'Status',
-            editable: true,    // ✅ Status bisa di-edit
+            editable: true,       // ✅ Status bisa di-edit
+            editComponent: 'select', // 📝 Gunakan select dropdown
+            editOptions: {
+                options: [
+                    { label: 'Aktif', value: 'Aktif' },
+                    { label: 'Cuti', value: 'Cuti' },
+                    { label: 'Resign', value: 'Resign' },
+                ],
+                placeholder: 'Pilih Status',
+            },
         },
         filterFn: 'equalsString',
         enableColumnFilter: true, // ✅ Filter aktif
-    },
-    {
-        accessorKey: 'joinDate',
-        header: () => <div className="text-sm font-semibold">Join Date</div>,
-        cell: ({ row }) => (
-            <div className="text-sm text-gray-600">{row.getValue('joinDate')}</div>
-        ),
-        meta: {
-            headerLabel: 'Join Date',
-            editable: false,   // ❌ Join Date tidak bisa di-edit (read-only)
-        },
-        filterFn: 'includesString',
-        enableColumnFilter: false, // ❌ Nonaktifkan filter untuk contoh
     },
 ]
 

@@ -11,8 +11,25 @@ import {
     ColumnFiltersState,
     ColumnDef,
 } from '@tanstack/react-table'
-import { MoveUp, MoveDown, MoveVertical } from 'lucide-react'
+import { MoveUp, MoveDown, MoveVertical, CalendarIcon } from 'lucide-react'
 import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select'
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from '@/components/ui/popover'
+import { Calendar } from '@/components/ui/calendar'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
+import { format } from 'date-fns'
 import { ExcelTableProps, CellSelection, DragSelection, ClipboardData } from './types'
 
 /**
@@ -768,29 +785,156 @@ export default function ExcelTable<TData extends Record<string, unknown>>({
                                                     columnId: cell.column.id,
                                                     isEditing: true
                                                 })
-                                            ) : (
-                                                <input
-                                                    autoFocus
-                                                    type="text"
-                                                    className="w-full h-full px-0 py-0 bg-transparent border-none outline-none focus:ring-0 text-gray-800 font-medium"
-                                                    defaultValue={String((row.original as Record<string, unknown>)[cell.column.id] || '')}
-                                                    onBlur={e => {
-                                                        const value = e.target.value
-                                                        handleInputChange(rowIndex, cell.column.id, value)
+                                            ) : (() => {
+                                                const cellValue = (row.original as Record<string, unknown>)[cell.column.id]
+                                                const editComponent = cell.column.columnDef.meta?.editComponent || 'input'
+                                                const editOptions = cell.column.columnDef.meta?.editOptions || {}
+
+                                                const handleChange = (value: unknown) => {
+                                                    handleInputChange(rowIndex, cell.column.id, value as string | number)
+                                                    setEditingCell(null)
+                                                }
+
+                                                const handleBlur = () => {
+                                                    setEditingCell(null)
+                                                }
+
+                                                const handleKeyDown = (e: React.KeyboardEvent) => {
+                                                    if (e.key === 'Escape') {
                                                         setEditingCell(null)
-                                                    }}
-                                                    onKeyDown={e => {
-                                                        if (e.key === 'Enter') {
-                                                            const value = (e.target as HTMLInputElement).value
-                                                            handleInputChange(rowIndex, cell.column.id, value)
-                                                            setEditingCell(null)
-                                                        }
-                                                        if (e.key === 'Escape') {
-                                                            setEditingCell(null)
-                                                        }
-                                                    }}
-                                                />
-                                            )
+                                                    }
+                                                }
+
+                                                // Custom render
+                                                if (editComponent === 'custom' && editOptions.customRender) {
+                                                    return editOptions.customRender({
+                                                        value: cellValue,
+                                                        onChange: handleChange,
+                                                        onBlur: handleBlur,
+                                                        onKeyDown: handleKeyDown,
+                                                    })
+                                                }
+
+                                                // Select dropdown - invisible mode (shows as input)
+                                                if (editComponent === 'select' && editOptions.options) {
+                                                    return (
+                                                        <div onClick={(e) => e.stopPropagation()} onMouseDown={(e) => e.stopPropagation()}>
+                                                            <Select
+                                                                value={String(cellValue || '')}
+                                                                onValueChange={(value) => handleChange(value)}
+                                                                open={true}
+                                                            >
+                                                                <SelectTrigger
+                                                                    className="w-full h-full border-none shadow-none focus:ring-0 px-0 bg-transparent"
+                                                                    onKeyDown={(e) => {
+                                                                        if (e.key === 'Enter') {
+                                                                            handleBlur()
+                                                                        }
+                                                                        handleKeyDown(e)
+                                                                    }}
+                                                                >
+                                                                    <SelectValue placeholder={editOptions.placeholder || 'Select...'} />
+                                                                </SelectTrigger>
+                                                                <SelectContent
+                                                                    onPointerDownOutside={() => handleBlur()}
+                                                                    onEscapeKeyDown={() => handleBlur()}
+                                                                >
+                                                                    {editOptions.options.map((opt) => (
+                                                                        <SelectItem key={opt.value} value={String(opt.value)}>
+                                                                            {opt.label}
+                                                                        </SelectItem>
+                                                                    ))}
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </div>
+                                                    )
+                                                }
+
+                                                // Date input with Calendar
+                                                if (editComponent === 'date') {
+                                                    const dateValue = cellValue ? new Date(String(cellValue)) : undefined
+
+                                                    return (
+                                                        <div onClick={(e) => e.stopPropagation()} onMouseDown={(e) => e.stopPropagation()}>
+                                                            <Popover defaultOpen={true}>
+                                                                <PopoverTrigger asChild>
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        className={cn(
+                                                                            "w-full h-full justify-start text-left font-medium px-0 border-none shadow-none hover:bg-transparent",
+                                                                            !dateValue && "text-muted-foreground"
+                                                                        )}
+                                                                        onKeyDown={handleKeyDown}
+                                                                    >
+                                                                        <CalendarIcon className="mr-2 h-4 w-4" />
+                                                                        {dateValue ? format(dateValue, "PPP") : <span>Pick a date</span>}
+                                                                    </Button>
+                                                                </PopoverTrigger>
+                                                                <PopoverContent
+                                                                    className="w-auto p-0"
+                                                                    align="start"
+                                                                    onInteractOutside={() => handleBlur()}
+                                                                    onEscapeKeyDown={() => handleBlur()}
+                                                                >
+                                                                    <Calendar
+                                                                        mode="single"
+                                                                        selected={dateValue}
+                                                                        onSelect={(date) => {
+                                                                            if (date) {
+                                                                                handleChange(format(date, 'yyyy-MM-dd'))
+                                                                            }
+                                                                        }}
+                                                                        initialFocus
+                                                                    />
+                                                                </PopoverContent>
+                                                            </Popover>
+                                                        </div>
+                                                    )
+                                                }
+
+                                                // Textarea
+                                                if (editComponent === 'textarea') {
+                                                    return (
+                                                        <Textarea
+                                                            autoFocus
+                                                            rows={editOptions.rows || 2}
+                                                            placeholder={editOptions.placeholder}
+                                                            className="w-full px-0 py-0 bg-transparent border-none shadow-none focus-visible:ring-0 text-gray-800 font-medium resize-none"
+                                                            defaultValue={String(cellValue || '')}
+                                                            onBlur={(e) => {
+                                                                handleChange(e.target.value)
+                                                            }}
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === 'Enter' && !e.shiftKey) {
+                                                                    e.preventDefault()
+                                                                    handleChange((e.target as HTMLTextAreaElement).value)
+                                                                }
+                                                                handleKeyDown(e)
+                                                            }}
+                                                        />
+                                                    )
+                                                }
+
+                                                // Default input
+                                                return (
+                                                    <Input
+                                                        autoFocus
+                                                        type="text"
+                                                        placeholder={editOptions.placeholder}
+                                                        className="w-full h-full px-0 py-0 bg-transparent border-none shadow-none focus-visible:ring-0 text-gray-800 font-medium"
+                                                        defaultValue={String(cellValue || '')}
+                                                        onBlur={(e) => {
+                                                            handleChange(e.target.value)
+                                                        }}
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter') {
+                                                                handleChange((e.target as HTMLInputElement).value)
+                                                            }
+                                                            handleKeyDown(e)
+                                                        }}
+                                                    />
+                                                )
+                                            })()
                                         ) : (
                                             <span className="text-gray-800 font-medium">
                                                 {renderCell ? (
