@@ -9,6 +9,7 @@ declare module '@tanstack/react-table' {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     interface ColumnMeta<TData, TValue> {
         headerLabel?: string // String label untuk filter placeholder
+        editable?: boolean   // Allow column to be edited (default: true)
     }
 }
 
@@ -55,10 +56,12 @@ export type ExcelTableProps<TData extends Record<string, unknown> = Record<strin
         sorting?: boolean
         /** Enable filtering (default: true) */
         filtering?: boolean
-        /** Enable row selection (default: true) */
+        /** Enable row selection with checkbox (default: true) */
         rowSelection?: boolean
         /** Enable keyboard shortcuts (default: true) */
         keyboardShortcuts?: boolean
+        /** Show select column with checkboxes (default: true) */
+        selectColumn?: boolean
     }
 
     /** Custom styling */

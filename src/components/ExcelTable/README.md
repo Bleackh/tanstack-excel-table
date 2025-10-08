@@ -3,8 +3,39 @@
 Komponen table reusable dengan fitur seperti Microsoft Excel, dibangun dengan TanStack Table dan Shadcn UI.
 
 ## ✨ Features
+### Disable Specific Features
 
-- ✅ **Copy/Paste/Cut** - Ctrl+C/V/X untuk copy, paste, dan cut cells
+```tsx
+<ExcelTable
+    data={data}
+    columns={columns}
+    features={{
+        clipboard: false,      // Disable copy/paste
+        history: false,        // Disable undo/redo
+        dragFill: false,       // Disable drag fill
+        sorting: true,         // Keep sorting enabled
+        filtering: true,       // Keep filtering enabled
+        rowSelection: false,   // Disable row selection
+        selectColumn: false,   // Hide select column with checkboxes
+        keyboardShortcuts: false // Disable keyboard shortcuts
+    }}
+/>
+```
+
+### Hide Select Column
+
+If you want to hide the checkbox select column completely:
+
+```tsx
+<ExcelTable
+    data={data}
+    columns={columns}
+    features={{
+        selectColumn: false,   // ❌ Hide entire select column
+        rowSelection: false,   // ❌ Also disable row selection functionality
+    }}
+/>
+```e/Cut** - Ctrl+C/V/X untuk copy, paste, dan cut cells
 - ✅ **Undo/Redo** - Ctrl+Z/Y untuk undo dan redo perubahan
 - ✅ **Drag Fill Handle** - Seperti di Excel, drag pojok kanan bawah cell untuk auto-fill
 - ✅ **Keyboard Navigation** - Arrow keys untuk navigasi antar cells
@@ -99,7 +130,8 @@ function MyTable() {
                 dragFill: true,         // Enable drag fill handle
                 sorting: true,          // Enable column sorting
                 filtering: true,        // Enable column filters
-                rowSelection: true,     // Enable row selection
+                rowSelection: true,     // Enable row selection functionality
+                selectColumn: true,     // Show/hide select column with checkboxes
                 keyboardShortcuts: true // Enable keyboard shortcuts
             }}
             
@@ -149,6 +181,50 @@ const columns = [
 ]
 \`\`\`
 
+### Control Column Editability
+
+You can control which columns are editable using the `meta.editable` property:
+
+\`\`\`tsx
+const columns: ColumnDef<MyData>[] = [
+    {
+        accessorKey: 'id',
+        header: () => <div>ID</div>,
+        cell: ({ row }) => <div>{row.getValue('id')}</div>,
+        meta: {
+            editable: false,  // ❌ ID column is read-only (cannot be edited)
+        },
+    },
+    {
+        accessorKey: 'name',
+        header: () => <div>Name</div>,
+        cell: ({ row }) => <div>{row.getValue('name')}</div>,
+        meta: {
+            editable: true,   // ✅ Name column can be edited (default)
+        },
+    },
+    {
+        accessorKey: 'email',
+        header: () => <div>Email</div>,
+        cell: ({ row }) => <div>{row.getValue('email')}</div>,
+        // No meta.editable specified = editable by default
+    },
+    {
+        accessorKey: 'createdAt',
+        header: () => <div>Created Date</div>,
+        cell: ({ row }) => <div>{row.getValue('createdAt')}</div>,
+        meta: {
+            editable: false,  // ❌ Date column is read-only
+        },
+    },
+]
+\`\`\`
+
+**Note:** 
+- Default behavior: If `meta.editable` is not specified, the column is **editable by default**
+- Set `meta.editable: false` to make a column **read-only**
+- Read-only columns cannot be edited via double-click, Enter key, or direct typing
+
 ### Disable Specific Features
 
 \`\`\`tsx
@@ -196,8 +272,32 @@ const columns = [
     dragFill?: boolean          // Drag fill handle (default: true)
     sorting?: boolean           // Column sorting (default: true)
     filtering?: boolean         // Column filters (default: true)
-    rowSelection?: boolean      // Row selection (default: true)
+    rowSelection?: boolean      // Row selection functionality (default: true)
+    selectColumn?: boolean      // Show/hide select column (default: true)
     keyboardShortcuts?: boolean // Keyboard shortcuts (default: true)
+}
+\`\`\`
+
+### ColumnMeta
+
+Each column can have additional metadata to control behavior:
+
+\`\`\`ts
+interface ColumnMeta {
+    headerLabel?: string  // Label for filter placeholder (default: column id)
+    editable?: boolean    // Allow column to be edited (default: true)
+}
+\`\`\`
+
+**Example:**
+\`\`\`tsx
+{
+    accessorKey: 'id',
+    header: () => <div>ID</div>,
+    meta: {
+        headerLabel: 'ID',
+        editable: false,    // Make this column read-only
+    },
 }
 \`\`\`
 

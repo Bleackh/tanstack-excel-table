@@ -82,18 +82,23 @@ export const columns: ColumnDef<Person, any>[] = [
     {
         id: 'select',
         header: ({ table }) => (
-            <div className="flex items-center justify-center">
+            <div className="flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
                 <Checkbox
-                    checked={table.getIsAllRowsSelected()}
-                    onCheckedChange={table.getToggleAllRowsSelectedHandler()}
+                    checked={
+                        table.getIsAllPageRowsSelected() ||
+                        (table.getIsSomePageRowsSelected() && 'indeterminate')
+                    }
+                    onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                    aria-label="Select all"
                 />
             </div>
         ),
         cell: ({ row }) => (
-            <div className="flex items-center justify-center">
+            <div className="flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
                 <Checkbox
                     checked={row.getIsSelected()}
-                    onCheckedChange={row.getToggleSelectedHandler()}
+                    onCheckedChange={(value) => row.toggleSelected(!!value)}
+                    aria-label="Select row"
                 />
             </div>
         ),
@@ -108,6 +113,7 @@ export const columns: ColumnDef<Person, any>[] = [
         ),
         meta: {
             headerLabel: 'ID', // String label untuk filter placeholder
+            editable: false,   // ❌ ID tidak bisa di-edit
         },
         filterFn: 'equalsString',
         enableColumnFilter: false, // ❌ Nonaktifkan filter untuk ID
@@ -120,6 +126,7 @@ export const columns: ColumnDef<Person, any>[] = [
         ),
         meta: {
             headerLabel: 'Name',
+            editable: true,    // ✅ Name bisa di-edit
         },
         filterFn: 'includesString',
         enableColumnFilter: true, // ✅ Filter aktif
@@ -186,6 +193,7 @@ export const columns: ColumnDef<Person, any>[] = [
         },
         meta: {
             headerLabel: 'Salary',
+            editable: true,    // ✅ Salary bisa di-edit
         },
         filterFn: 'equalsString',
         enableColumnFilter: false, // ❌ Nonaktifkan filter untuk sensitive data
@@ -208,6 +216,7 @@ export const columns: ColumnDef<Person, any>[] = [
         },
         meta: {
             headerLabel: 'Status',
+            editable: true,    // ✅ Status bisa di-edit
         },
         filterFn: 'equalsString',
         enableColumnFilter: true, // ✅ Filter aktif
@@ -220,6 +229,7 @@ export const columns: ColumnDef<Person, any>[] = [
         ),
         meta: {
             headerLabel: 'Join Date',
+            editable: false,   // ❌ Join Date tidak bisa di-edit (read-only)
         },
         filterFn: 'includesString',
         enableColumnFilter: false, // ❌ Nonaktifkan filter untuk contoh
@@ -276,6 +286,7 @@ export default function Table() {
                         filtering: true,
                         rowSelection: true,
                         keyboardShortcuts: true,
+                        selectColumn: true
                     }}
                 />
 

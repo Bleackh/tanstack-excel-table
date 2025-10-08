@@ -56,6 +56,7 @@ export default function ExcelTable<TData extends Record<string, unknown>>({
         filtering = true,
         rowSelection = true,
         keyboardShortcuts = true,
+        selectColumn = false,
     } = features
 
     const [data, setData] = useState<TData[]>(() => [...initialData])
@@ -333,6 +334,15 @@ export default function ExcelTable<TData extends Record<string, unknown>>({
         const isPrintableCharacter = e.key.length === 1 && !isCtrl && !e.altKey
 
         if (isPrintableCharacter && selectedCell) {
+            // Check if selected column is editable
+            const selectedColumn = filteredColumns.find(col => {
+                const colId = 'id' in col ? col.id : 'accessorKey' in col ? col.accessorKey : null
+                return colId === selectedCell.colId
+            })
+            const isEditable = selectedColumn?.meta?.editable !== false
+
+            if (!isEditable) return
+
             e.preventDefault()
             const rowId = (data[selectedCell.rowIndex] as Record<string, unknown>).id as number
             setEditingCell({ rowId, colId: selectedCell.colId })
@@ -384,6 +394,15 @@ export default function ExcelTable<TData extends Record<string, unknown>>({
             case 'Enter':
                 e.preventDefault()
                 if (selectedCell) {
+                    // Check if selected column is editable
+                    const selectedColumn = filteredColumns.find(col => {
+                        const colId = 'id' in col ? col.id : 'accessorKey' in col ? col.accessorKey : null
+                        return colId === selectedCell.colId
+                    })
+                    const isEditable = selectedColumn?.meta?.editable !== false
+
+                    if (!isEditable) return
+
                     const rowId = (data[selectedCell.rowIndex] as Record<string, unknown>).id as number
                     setEditingCell({ rowId, colId: selectedCell.colId })
                 }
@@ -520,9 +539,17 @@ export default function ExcelTable<TData extends Record<string, unknown>>({
         updateDataWithHistory(newData)
     }
 
+    // Filter columns based on selectColumn prop
+    const filteredColumns = selectColumn
+        ? columnsProp
+        : columnsProp.filter(col => {
+            const colId = 'id' in col ? col.id : 'accessorKey' in col ? col.accessorKey : null
+            return colId !== 'select'
+        })
+
     const table = useReactTable({
         data,
-        columns: columnsProp,
+        columns: filteredColumns,
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: sorting ? getSortedRowModel() : undefined,
         getFilteredRowModel: filtering ? getFilteredRowModel() : undefined,
@@ -701,6 +728,10 @@ export default function ExcelTable<TData extends Record<string, unknown>>({
                                         }}
                                         onDoubleClick={() => {
                                             if (cell.column.id === 'select') return
+
+                                            // Check if column is editable
+                                            const isEditable = cell.column.columnDef.meta?.editable !== false
+                                            if (!isEditable) return
 
                                             setEditingCell({ rowId: rowId as number, colId: cell.column.id })
                                             setSelectedCell({ rowIndex, colId: cell.column.id })
