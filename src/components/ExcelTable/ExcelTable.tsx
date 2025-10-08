@@ -11,21 +11,22 @@ import {
     ColumnFiltersState,
     ColumnDef,
 } from '@tanstack/react-table'
-import { MoveUp, MoveDown, MoveVertical, CalendarIcon } from 'lucide-react'
+import { MoveUp, MoveDown, MoveVertical, CalendarIcon, Check, ChevronsUpDown } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select'
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
 } from '@/components/ui/popover'
+import {
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList,
+} from '@/components/ui/command'
 import { Calendar } from '@/components/ui/calendar'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -54,6 +55,85 @@ import { ExcelTableProps, CellSelection, DragSelection, ClipboardData } from './
  * />
  * ```
  */
+
+// Combobox Editor Component (extracted to avoid hooks rule violation)
+function ComboboxEditor({ 
+    cellValue, 
+    editOptions, 
+    handleChange, 
+    handleBlur 
+}: { 
+    cellValue: unknown
+    editOptions: { 
+        options?: Array<{ label: string; value: string | number }>
+        placeholder?: string
+    }
+    handleChange: (value: unknown) => void
+    handleBlur: () => void
+}) {
+    const [open, setOpen] = useState(true)
+    const selectedOption = editOptions.options?.find(opt => String(opt.value) === String(cellValue))
+
+    return (
+        <div onClick={(e) => e.stopPropagation()} onMouseDown={(e) => e.stopPropagation()}>
+            <Popover open={open} onOpenChange={setOpen}>
+                <PopoverTrigger asChild>
+                    <Button
+                        variant="ghost"
+                        role="combobox"
+                        aria-expanded={open}
+                        className="w-full h-full justify-between px-0 border-none shadow-none hover:bg-transparent font-medium"
+                    >
+                        <span className="truncate">
+                            {selectedOption ? selectedOption.label : (editOptions.placeholder || 'Select...')}
+                        </span>
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                </PopoverTrigger>
+                <PopoverContent
+                    className="w-[200px] p-0"
+                    align="start"
+                    onInteractOutside={() => {
+                        setOpen(false)
+                        handleBlur()
+                    }}
+                    onEscapeKeyDown={() => {
+                        setOpen(false)
+                        handleBlur()
+                    }}
+                >
+                    <Command>
+                        <CommandInput placeholder={`Search ${editOptions.placeholder || 'option'}...`} />
+                        <CommandList>
+                            <CommandEmpty>No option found.</CommandEmpty>
+                            <CommandGroup>
+                                {editOptions.options?.map((opt) => (
+                                    <CommandItem
+                                        key={opt.value}
+                                        value={String(opt.value)}
+                                        onSelect={(currentValue) => {
+                                            handleChange(currentValue === String(cellValue) ? '' : currentValue)
+                                            setOpen(false)
+                                        }}
+                                    >
+                                        <Check
+                                            className={cn(
+                                                "mr-2 h-4 w-4",
+                                                String(cellValue) === String(opt.value) ? "opacity-100" : "opacity-0"
+                                            )}
+                                        />
+                                        {opt.label}
+                                    </CommandItem>
+                                ))}
+                            </CommandGroup>
+                        </CommandList>
+                    </Command>
+                </PopoverContent>
+            </Popover>
+        </div>
+    )
+}
+
 export default function ExcelTable<TData extends Record<string, unknown>>({
     data: initialData,
     columns: columnsProp,
@@ -815,38 +895,15 @@ export default function ExcelTable<TData extends Record<string, unknown>>({
                                                     })
                                                 }
 
-                                                // Select dropdown - invisible mode (shows as input)
+                                                // Combobox dropdown - searchable select
                                                 if (editComponent === 'select' && editOptions.options) {
                                                     return (
-                                                        <div onClick={(e) => e.stopPropagation()} onMouseDown={(e) => e.stopPropagation()}>
-                                                            <Select
-                                                                value={String(cellValue || '')}
-                                                                onValueChange={(value) => handleChange(value)}
-                                                                open={true}
-                                                            >
-                                                                <SelectTrigger
-                                                                    className="w-full h-full border-none shadow-none focus:ring-0 px-0 bg-transparent"
-                                                                    onKeyDown={(e) => {
-                                                                        if (e.key === 'Enter') {
-                                                                            handleBlur()
-                                                                        }
-                                                                        handleKeyDown(e)
-                                                                    }}
-                                                                >
-                                                                    <SelectValue placeholder={editOptions.placeholder || 'Select...'} />
-                                                                </SelectTrigger>
-                                                                <SelectContent
-                                                                    onPointerDownOutside={() => handleBlur()}
-                                                                    onEscapeKeyDown={() => handleBlur()}
-                                                                >
-                                                                    {editOptions.options.map((opt) => (
-                                                                        <SelectItem key={opt.value} value={String(opt.value)}>
-                                                                            {opt.label}
-                                                                        </SelectItem>
-                                                                    ))}
-                                                                </SelectContent>
-                                                            </Select>
-                                                        </div>
+                                                        <ComboboxEditor
+                                                            cellValue={cellValue}
+                                                            editOptions={editOptions}
+                                                            handleChange={handleChange}
+                                                            handleBlur={handleBlur}
+                                                        />
                                                     )
                                                 }
 

@@ -231,7 +231,7 @@ ExcelTable menggunakan **Shadcn UI components** untuk editor yang cantik dan kon
 
 **Available Editor Types:**
 - `input` - Text input (default)
-- `select` - Dropdown select (invisible mode, terlihat seperti input)
+- `select` - Combobox dropdown dengan search (searchable select)
 - `date` - Date picker dengan calendar
 - `textarea` - Multi-line text
 - `custom` - Custom render function
@@ -239,7 +239,7 @@ ExcelTable menggunakan **Shadcn UI components** untuk editor yang cantik dan kon
 **Required Shadcn UI Components:**
 ```bash
 npx shadcn@latest add input
-npx shadcn@latest add select
+npx shadcn@latest add command      # untuk combobox
 npx shadcn@latest add textarea
 npx shadcn@latest add calendar
 npx shadcn@latest add popover
@@ -253,7 +253,7 @@ pnpm add date-fns  # untuk date formatting
 
 #### Examples:
 
-**1. SELECT DROPDOWN (Invisible Mode)**
+**1. COMBOBOX DROPDOWN (Searchable Select)**
 ```tsx
 {
     accessorKey: 'status',
@@ -271,7 +271,11 @@ pnpm add date-fns  # untuk date formatting
     },
 }
 ```
-**Catatan:** Select akan terlihat seperti input biasa saat tidak di-edit, dan saat di-edit akan muncul dropdown untuk memilih value. Ini membuat tampilan lebih clean dan consistent dengan cell lain.
+**Catatan:** Menggunakan Combobox dari Shadcn UI yang mendukung **search/filter options**. User bisa mengetik untuk mencari option. Features:
+- ✅ Searchable - bisa ketik untuk cari
+- ✅ Keyboard navigation
+- ✅ Checkmark untuk selected value
+- ✅ Auto open saat edit mode
 
 **2. DATE PICKER with Calendar**
 ```tsx
