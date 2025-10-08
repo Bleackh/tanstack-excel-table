@@ -702,10 +702,14 @@ export default function ExcelTable<TData extends Record<string, unknown>>({
                                         currentColIndex >= minCol && currentColIndex <= maxCol
                                 })()
 
+                                // Check if column is editable
+                                const isColumnEditable = cell.column.columnDef.meta?.editable !== false
+
                                 return (
                                     <td
                                         key={cell.id}
-                                        className={`relative px-6 py-3 cursor-pointer border-r border-gray-100 last:border-r-0 transition-all duration-150 
+                                        className={`relative px-6 py-3 border-r border-gray-100 last:border-r-0 transition-all duration-150 
+                                                    ${isColumnEditable ? 'cursor-pointer' : 'cursor-not-allowed bg-gray-50/50'}
                                                     ${isSelected ? 'bg-green-50 ring-2 ring-green-400 ring-inset' : ''} 
                                                     ${isEditing ? 'bg-blue-50 ring-2 ring-blue-300 ring-inset' : ''} 
                                                     ${isInSelectedRange && !isSelected ? 'bg-green-100/50' : ''}
