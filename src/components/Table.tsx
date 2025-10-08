@@ -114,9 +114,9 @@ export const columns: ColumnDef<Person, any>[] = [
     },
     {
         accessorKey: 'name',
-        header: () => <div className="text-sm font-semibold">Name</div>,
+        header: () => <div className="text-center text-sm font-semibold">Name</div>,
         cell: ({ row }) => (
-            <div className="text-sm font-medium">{row.getValue('name')}</div>
+            <div className="text-sm font-medium text-center">{row.getValue('name')}</div>
         ),
         meta: {
             headerLabel: 'Name',

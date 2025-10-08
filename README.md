@@ -54,25 +54,53 @@ Check out the [ExcelTable Component Documentation](./src/components/ExcelTable/R
 
 ```tsx
 import { ExcelTable } from '@/components/ExcelTable'
-import { createColumnHelper } from '@tanstack/react-table'
+import { ColumnDef } from '@tanstack/react-table'
 
-type Data = {
+type Person = {
   id: number
   name: string
-  value: number
+  age: number
+  email: string
 }
 
-const columnHelper = createColumnHelper<Data>()
-
-const columns = [
-  columnHelper.accessor('id', { header: 'ID' }),
-  columnHelper.accessor('name', { header: 'Name' }),
-  columnHelper.accessor('value', { header: 'Value' }),
+// Define columns using ColumnDef format for full control
+const columns: ColumnDef<Person>[] = [
+  {
+    accessorKey: 'id',
+    header: () => <div className="text-sm font-semibold">ID</div>,
+    cell: ({ row }) => <div className="text-sm">{row.getValue('id')}</div>,
+    enableColumnFilter: false,
+  },
+  {
+    accessorKey: 'name',
+    header: () => <div className="text-sm font-semibold">Name</div>,
+    cell: ({ row }) => <div className="text-sm font-medium">{row.getValue('name')}</div>,
+    meta: { headerLabel: 'Name' },
+    filterFn: 'includesString',
+    enableColumnFilter: true,
+  },
+  {
+    accessorKey: 'age',
+    header: () => <div className="text-sm font-semibold">Age</div>,
+    cell: ({ row }) => <div className="text-sm text-center">{row.getValue('age')}</div>,
+    meta: { headerLabel: 'Age' },
+    filterFn: 'equalsString',
+    enableColumnFilter: true,
+  },
+  {
+    accessorKey: 'email',
+    header: () => <div className="text-sm font-semibold">Email</div>,
+    cell: ({ row }) => <div className="text-sm text-blue-600">{row.getValue('email')}</div>,
+    meta: { headerLabel: 'Email' },
+    filterFn: 'includesString',
+    enableColumnFilter: true,
+  },
 ]
 
-const data = [
-  { id: 1, name: 'Item 1', value: 100 },
-  { id: 2, name: 'Item 2', value: 200 },
+const data: Person[] = [
+  { id: 1, name: 'John Doe', age: 28, email: 'john@example.com' },
+  { id: 2, name: 'Jane Smith', age: 32, email: 'jane@example.com' },
+  { id: 3, name: 'Bob Johnson', age: 25, email: 'bob@example.com' },
 ]
 
 export default function MyTable() {

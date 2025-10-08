@@ -564,15 +564,15 @@ export default function ExcelTable<TData extends Record<string, unknown>>({
                                 {headerGroup.headers.map(header => (
                                     <th
                                         key={header.id}
-                                        className="px-6 py-4 text-left font-semibold text-gray-700 text-sm uppercase tracking-wider border-r border-gray-200 last:border-r-0 bg-gray-50"
+                                        className="px-6 py-4 font-semibold text-gray-700 text-sm uppercase tracking-wider border-r border-gray-200 last:border-r-0 bg-gray-50 relative text-left"
                                     >
                                         {header.id !== 'select' && sorting ? (
                                             <div
-                                                className="flex items-center gap-2 cursor-pointer select-none transition-colors hover:text-gray-900"
+                                                className="cursor-pointer select-none transition-colors hover:text-gray-900"
                                                 onClick={header.column.getToggleSortingHandler()}
                                             >
                                                 {flexRender(header.column.columnDef.header, header.getContext())}
-                                                <span className="text-gray-400">
+                                                <span className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400">
                                                     {header.column.getIsSorted() === 'asc' ? (
                                                         <MoveUp className="w-4 h-4 text-green-600" />
                                                     ) : header.column.getIsSorted() === 'desc' ? (
