@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { ColumnDef } from '@tanstack/react-table'
 import { Checkbox } from '@/components/ui/checkbox'
 import { ExcelTable, TableInstructions, TableStatusBar } from './ExcelTable'
+import { SubmitIssueDialog } from './SubmitIssueDialog'
 
 type Person = {
     id: number
@@ -263,14 +264,21 @@ export default function Table() {
     return (
         <div className="p-8 bg-gradient-to-br from-slate-50 to-gray-100 min-h-screen">
             <div className="max-w-6xl mx-auto">
-                <TableInstructions
-                    title="Excel-Like Table with Shadcn UI ✨"
-                    description="Full-featured spreadsheet with undo/redo, copy/paste, drag fill, and more"
-                    dragFill={true}
-                    keyboardShortcuts={true}
-                    clipboard={true}
-                    history={true}
-                />
+                <div className="flex justify-between items-start mb-4">
+                    <div className="flex-1">
+                        <TableInstructions
+                            title="Excel-Like Table with Shadcn UI ✨"
+                            description="Full-featured spreadsheet with undo/redo, copy/paste, drag fill, and more"
+                            dragFill={true}
+                            keyboardShortcuts={true}
+                            clipboard={true}
+                            history={true}
+                        />
+                    </div>
+                    <div className="ml-4">
+                        <SubmitIssueDialog />
+                    </div>
+                </div>
 
                 <ExcelTable<Person>
                     data={data}
