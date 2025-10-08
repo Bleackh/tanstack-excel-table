@@ -32,6 +32,13 @@ Enhancement suggestions are tracked as GitHub issues. When creating an enhanceme
 5. **Commit your changes** with clear commit messages
 6. **Push to your fork** and submit a pull request
 
+**Note:** The `main` branch is protected and requires:
+- All status checks to pass (Lint and Build)
+- At least one approval from a maintainer
+- All conversations to be resolved
+
+See [Branch Protection Settings](./.github/BRANCH_PROTECTION.md) for more details.
+
 ## 📝 Development Setup
 
 ### Prerequisites
@@ -100,6 +107,20 @@ Before submitting a pull request:
    - Firefox
    - Safari
    - Edge
+
+4. **Run CI checks locally**:
+   ```bash
+   pnpm lint    # Verify code style
+   pnpm build   # Ensure project builds
+   ```
+
+## 🔄 Continuous Integration
+
+All pull requests must pass automated checks:
+- **Lint**: Code must pass ESLint checks
+- **Build**: Project must build successfully
+
+These checks run automatically via GitHub Actions when you submit a pull request.
 
 ## 📋 Commit Message Guidelines
 
