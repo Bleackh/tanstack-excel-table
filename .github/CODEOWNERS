@@ -1,0 +1,20 @@
+# CODEOWNERS
+# 
+# This file defines who is responsible for code in this repository.
+# Code owners are automatically requested for review when someone 
+# opens a pull request that modifies code that they own.
+#
+# Order is important; the last matching pattern takes precedence.
+#
+# More information: 
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Repository owner is the code owner for all files
+# This ensures all PRs require approval from the repository owner
+* @Bleackh
+
+# Specific paths (examples - uncomment and modify as needed)
+# /docs/ @Bleackh
+# /src/ @Bleackh
+# *.md @Bleackh
+# .github/ @Bleackh
