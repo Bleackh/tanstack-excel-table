@@ -136,6 +136,13 @@ pnpm lint         # Run ESLint
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
+**Note:** The `main` branch is protected with the following requirements:
+- All CI checks must pass (Lint and Build)
+- At least one approval from a maintainer
+- All PR conversations must be resolved
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for detailed contribution guidelines and [Branch Protection Settings](./.github/BRANCH_PROTECTION.md) for more information.
+
 ## 📄 License
 
 This project is open source and available under the [MIT License](LICENSE).
